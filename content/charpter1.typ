@@ -1,7 +1,11 @@
 #import "../lib.typ": *
 
-
-= 快速开始
+= ElegantTypst 系列模板介绍
+  我们致力于打造一系列美观、优雅、简便的模板方便用户使用。目前只有 Elegant-Typst-Book，用于排版书籍和笔记。
+  本文将介绍本模板的一些设置内容以及基本使用方法。如果您有其他问题，建议或者意见，欢迎在 GitHub上给我们提交 issues
+  
+GitHub 地址：#link("https://github.com/Monika-shipship/Elegant-typst-book")
+== 快速开始
 
 要开始使用此模板，你需要
 
@@ -12,11 +16,13 @@
 
 + 导入模板，并在文档开头设置参数，包括标题、作者、课程或主题、学期、时间；
   ```typ
-    #import "@preview/ori:0.2.2": *
+  #import "lib.typ": *
 
-    #show: ori.with(
-    title: [Ori in Typst\ 文档标题],
-    short-title: [Ori in Typst],
+  #set heading(numbering: numbly("{1:一}、", default: "1.1  "))
+
+  #show: elegant-typst-book.with(
+    title: [ElegantTypstBook\ 优美的Typst书籍模板],
+    short-title: [ElegantTypstBook],
     // 笔记描述（选填）
     description: [
       文档描述示例\ 逸一时误一世，忆久忆久罢已龄
@@ -30,10 +36,20 @@
         //homepage: "https://github.com/a-kkiri",
         affiliations: "1,2",
       ),
+      (
+        name: "作者二",
+        //github: "https://github.com/a-kkiri",
+        //homepage: "https://github.com/a-kkiri",
+        affiliations: "3,4",
+      ),
     ),
+
+    // 所属组织列表，每一项包括一个 id 和 name。这些将显示在作者下方。
     affiliations: (
       (id: "1", name: "114 University"),
       (id: "2", name: "514 Inc."),
+      (id: "1", name: "1919 University"),
+      (id: "2", name: "810 Inc."),
     ),
     // 学期
     semester: "2025 春",
@@ -50,7 +66,10 @@
     // 正文背景颜色（选填 HEX 颜色或 none）
     // background-color: "#FAF9DE",
 
-    theme: "dark", //此处有bug
+    // theme: "dark", //此处有bug
     // media: "screen",
   )
+
+  #include "content/charpter1.typ"
+  #include "content/charpter2.typ"
   ```

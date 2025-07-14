@@ -65,7 +65,7 @@
 /// - `bibliography-file` (string | none): BibTeX/CSL JSON 路径；为空则禁用引用与参考文献。默认 `none`。
 /// - `bibstyle` (string): 引用与文献样式 ID，例如 `"gb-7714-2015-numeric"`, `"apa"`。默认 `"gb-7714-2015-numeric"`。
 /// - `paper-size` (string): 纸张尺寸，仅 `media: "print"` 时生效，如 `"a4"`、`"letter"`。默认 `"a4"`。
-/// - `accent` (color): 主题强调色 (HEX/CSS 名/色关键字)。用于一级标题、表格线与 `strong` 高亮。默认 `"#000000"`。
+/// - ` color` (color): 主题强调色 (HEX/CSS 名/色关键字)。用于一级标题、表格线与 `strong` 高亮。默认 `"#000000"`。
 /// - `font` (object): 字体族配置。可指定 `main`、`mono`、`cjk`、`math`、`math-cjk` 等子字段；缺省为 `default-font`。
 /// - `lang` (string): 主要语言代码，影响分词、连字符、标点。默认 `"zh"`。
 /// - `region` (string): 地区代码，用于细化本地化规则。默认 `"cn"`。
@@ -77,7 +77,7 @@
 /// - `background-color` (color | none): 正文背景色，建议仅在 `theme: "light"` 下使用。默认 `none`。
 /// - body (content): 文档的内容。
 /// -> content
-#let ori(
+#let elegant-typst-book(
   media: "print",
   theme: "light", //fix the bug
   size: 11pt,
@@ -92,7 +92,7 @@
   bibliography-file: none,
   bibstyle: "gb-7714-2015-numeric",
   paper-size: "a4",
-  accent: "#000000",
+   color: "#000000",
   font: default-font,
   lang: "zh",
   region: "cn",
@@ -128,7 +128,7 @@
   )
   // show: zebraw.with(..zebraw-themes.zebra-reverse)
   // show: zebraw.with(..zebraw-themes.zebra)
-  let accent-color = rgb(accent)
+  let  rgbcolor = rgb(color)
 
   assert(media == "screen" or media == "print", message: "media must be 'screen' or 'print'")
   assert(theme == "light" or theme == "dark", message: "theme must be 'light' or 'dark'")
@@ -149,7 +149,7 @@
     region: region,
   )
   // 设置中文粗体
-  show strong: set text(fill: accent-color, font: ((name: font.main, covers: "latin-in-cjk"), font.cjk))
+  show strong: set text(fill:  rgbcolor, font: ((name: font.main, covers: "latin-in-cjk"), font.cjk))
 
   show emph: text.with(font: ((name: font.main, covers: "latin-in-cjk"), font.emph-cjk))
   show raw: set text(font: ((name: font.mono, covers: "latin-in-cjk"), font.cjk))
@@ -164,7 +164,7 @@
     // size: 1em,
   )
   // 文本高亮
-  set highlight(fill: accent-color.lighten(50%))
+  set highlight(fill:  rgbcolor.lighten(50%))
 
   /// 设置段落样式。
   set par(justify: true, first-line-indent: if first-line-indent == auto {
@@ -267,7 +267,7 @@
 
   // 配置表格（不能用if{}，因使用if{}后作用域仅局限在块里，无法影响body）
   set table(
-    fill: (_, row) => if row == 0 { accent-color.lighten(60%) } else { accent-color.lighten(80%) },
+    fill: (_, row) => if row == 0 {  rgbcolor.lighten(60%) } else {  rgbcolor.lighten(80%) },
     stroke: 1pt + white,
   ) if theme == "light"
 
@@ -420,10 +420,10 @@
       #align(center + top)[
         #if date != none {
           text(size: 12pt, "最初写作于：")
-          text(size: 12pt, fill: accent-color, weight: "semibold", date.display("[year]年[month]月[day]日"))
+          text(size: 12pt, fill:  rgbcolor, weight: "semibold", date.display("[year]年[month]月[day]日"))
           parbreak()
           text(size: 12pt, "最后更新于：")
-          text(size: 12pt, fill: accent-color, weight: "semibold", datetime.today().display("[year]年[month]月[day]日"))
+          text(size: 12pt, fill:  rgbcolor, weight: "semibold", datetime.today().display("[year]年[month]月[day]日"))
         } else {
           (
             text(size: 11pt)[最后更新于：#h(5pt)]

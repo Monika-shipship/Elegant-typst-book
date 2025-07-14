@@ -2,9 +2,9 @@
 
 #set heading(numbering: numbly("{1:一}、", default: "1.1  "))
 
-#show: ori.with(
-  title: [Ori in Typst\ 文档标题],
-  short-title: [Ori in Typst],
+#show: elegant-typst-book.with(
+  title: [ElegantTypstBook\ 优美的Typst书籍模板],
+  short-title: [ElegantTypstBook],
   // 笔记描述（选填）
   description: [
     文档描述示例\ 逸一时误一世，忆久忆久罢已龄
@@ -42,13 +42,13 @@
   maketitle: true,
   makeoutline: true,
   // 主题色
-  accent: blue,
+  color: blue,
   // 封面背景图片（选填图片路径或 none）
   // cover-image: "./figures/cover-image.png",
   // 正文背景颜色（选填 HEX 颜色或 none）
   // background-color: "#FAF9DE",
-
-  theme: "dark", //此处有bug
+  first-line-indent: auto,
+  // theme: "dark", //此处有bug
   // media: "screen",
 )
 
