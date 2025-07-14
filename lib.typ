@@ -51,21 +51,30 @@
 
 
 /// 模板的核心类，规范了文档的格式。
-/// - media (string): 媒体类型，可选值为 `"screen"` 和 `"print"`。默认为 `"print"`。
-/// - theme (string): 主题，可选值为 `"light"` 和 `"dark"`。默认为 `"light"`。
-/// - size (length): 字体大小。默认为 `11pt`。
-/// - screen-size (length): 屏幕字体大小。默认为 `11pt`。
-/// - title (string): 文档的标题。
-/// - short-title (string) ：文档的短标题。
-/// - authors (string): 作者，实际上是一个字典。
-/// - subject (string): 课程名。（已删除）
-/// - semester (string): 学期。
-/// - date (datetime): 创建日期。
-/// - bibliography-file (string): 参考书目文件路径及引用样式。
-/// - accent : 主题色，将会设置一级标题，表格，`strong`的颜色
-/// - font (object): 字体。默认为 `default-font`。如果你想使用不同的字体，可以传入一个字典，包含 `main`、`mono`、`cjk`、`math` 和 `math-cjk` 字段。
-/// - lang (string): 语言。默认为 `zh`。
-/// - region (string): 地区。默认为 `cn`。
+/// - `media` (string): 输出介质，可选 `"screen"` 或 `"print"`，决定排版用纸尺寸与配色方案。默认 `"print"`。
+/// - `theme` (string): 主题色调，可选 `"light"` 或 `"dark"`。影响整体背景与文字基色。默认 `"light"`。
+/// - `size` (length): 正文字号。可写 `pt` / `mm` / `em` 等单位。默认 `11pt`。
+/// - `screen-size` (length): 针对投屏/网页阅读的字号；未显式设置时沿用 `size`。默认 `11pt`。
+/// - `title` (string | none): 文档主标题，用于封面、页眉与 PDF 元数据。默认 `none`。
+/// - `short-title` (string | none): 短标题，出现在页眉与目录；缺省时回退到 `title`。默认 `none`。
+/// - `description` (string | none): 摘要/副标题，可填入一句话简介。默认 `none`。
+/// - `authors` (array): 作者列表。每项为字典，如 `(name, github?, homepage?, affiliations)`。默认空数组 `()`。
+/// - `affiliations` (array): 机构对照表，每项形如 `(id, name)`，供作者用 `id` 引用。默认空数组 `()`。
+/// - `semester` (string | none): 学期信息（如 “2025 春”），常见于课堂报告模板。默认 `none`。
+/// - `date` (datetime | none): 创建日期，典型写法 `datetime(year: 2025, month: 7, day: 14)`。默认 `none`。
+/// - `bibliography-file` (string | none): BibTeX/CSL JSON 路径；为空则禁用引用与参考文献。默认 `none`。
+/// - `bibstyle` (string): 引用与文献样式 ID，例如 `"gb-7714-2015-numeric"`, `"apa"`。默认 `"gb-7714-2015-numeric"`。
+/// - `paper-size` (string): 纸张尺寸，仅 `media: "print"` 时生效，如 `"a4"`、`"letter"`。默认 `"a4"`。
+/// - `accent` (color): 主题强调色 (HEX/CSS 名/色关键字)。用于一级标题、表格线与 `strong` 高亮。默认 `"#000000"`。
+/// - `font` (object): 字体族配置。可指定 `main`、`mono`、`cjk`、`math`、`math-cjk` 等子字段；缺省为 `default-font`。
+/// - `lang` (string): 主要语言代码，影响分词、连字符、标点。默认 `"zh"`。
+/// - `region` (string): 地区代码，用于细化本地化规则。默认 `"cn"`。
+/// - `first-line-indent` (object): 段首缩进设置 `{amount, all}`；`all` 为 `true` 时连首段也缩进。默认 `{0pt, false}`。
+/// - `maketitle` (bool): 是否自动生成封面页。默认 `false`。
+/// - `makeoutline` (bool): 是否自动插入目录。默认 `false`。
+/// - `outline-depth` (int): 目录层级深度，`2` 表示到 `subsection`。默认 `2`。
+/// - `cover-image` (string | none): 封面背景图文件路径或 `none`。默认 `none`。
+/// - `background-color` (color | none): 正文背景色，建议仅在 `theme: "light"` 下使用。默认 `none`。
 /// - body (content): 文档的内容。
 /// -> content
 #let ori(
@@ -78,7 +87,6 @@
   description: none,
   authors: (),
   affiliations: (),
-  //subject已删除
   semester: none,
   date: none,
   bibliography-file: none,
