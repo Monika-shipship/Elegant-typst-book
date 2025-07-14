@@ -5,10 +5,10 @@
 
 == 参数总览
 
-- `media` (string): 输出介质，可选 `"screen"` 或 `"print"`，决定排版用纸尺寸与配色方案。默认 `"print"`。
+- `media` (string): 输出介质，可选 `"pad"` 或 `"normal"`，决定排版用纸尺寸与配色方案。默认 `"normal"`。
 - `theme` (string): 主题色调，可选 `"light"` 或 `"dark"`。影响整体背景与文字基色。默认 `"light"`。
 - `size` (length): 正文字号。可写 `pt` / `mm` / `em` 等单位。默认 `11pt`。
-- `screen-size` (length): 针对投屏/网页阅读的字号；未显式设置时沿用 `size`。默认 `11pt`。
+- `pad-size` (length): 针对投屏/网页阅读的字号；未显式设置时沿用 `size`。默认 `11pt`。
 - `title` (string | none): 文档主标题，用于封面、页眉与 PDF 元数据。默认 `none`。
 - `short-title` (string | none): 短标题，出现在页眉与目录；缺省时回退到 `title`。默认 `none`。
 - `description` (string | none): 摘要/副标题，可填入一句话简介。默认 `none`。
@@ -18,7 +18,7 @@
 - `date` (datetime | none): 创建日期，典型写法 `datetime(year: 2025, month: 7, day: 14)`。默认 `none`。
 - `bibliography-file` (string | none): BibTeX/CSL JSON 路径；为空则禁用引用与参考文献。默认 `none`。
 - `bibstyle` (string): 引用与文献样式 ID，例如 `"gb-7714-2015-numeric"`, `"apa"`。默认 `"gb-7714-2015-numeric"`。
-- `paper-size` (string): 纸张尺寸，仅 `media: "print"` 时生效，如 `"a4"`、`"letter"`。默认 `"a4"`。
+- `paper-size` (string): 纸张尺寸，仅 `media: "normal"` 时生效，如 `"a4"`、`"letter"`。默认 `"a4"`。
 - `color` (color): 主题强调色 (HEX/CSS 名/色关键字)。用于一级标题、表格线与 `strong` 高亮。默认 `"#000000"`。
 - `font` (object): 字体族配置。可指定 `main`、`mono`、`cjk`、`math`、`math-cjk` 等子字段；缺省为 `default-font`。
 - `lang` (string): 主要语言代码，影响分词、连字符、标点。默认 `"zh"`。
@@ -31,17 +31,17 @@
 - `background-color` (color | none): 正文背景色，建议仅在 `theme: "light"` 下使用。默认 `none`。
 - `body` (content): 文档的内容。
 == 设备选项
-如果在 iPad 上看无需切边，放大你可以使用下面的选项将版面设置为 `screen`模式： \
-`media` (string): 输出介质，可选 `"screen"` 或 `"print"`，决定排版用纸尺寸与配色方案。默认 `"print"`。
+如果在 iPad 上看无需切边，放大你可以使用下面的选项将版面设置为 `pad`模式： \
+`media` (string): 输出介质，可选 `"pad"` 或 `"normal"`，决定排版用纸尺寸与配色方案。默认 `"normal"`。
 == 颜色主题
 你可以配置 `color` 为颜色主题，可选参数有 `orange` `blue` `olive` `red` `eastern` `yellow` `navy`
-此颜色会改变
-颜色主题表格//TODO 颜色主题表格更新
+此颜色用于一级标题、表格线与 `strong` 高亮//TODO 颜色主题表格更新
 == 封面
-=== 封面个性化
-=== 封面图
-=== 徽标
-=== 自定义封面
+// === 封面个性化
+// === 封面图
+// === 徽标
+// === 自定义封面
+封面内容暂不更新
 == 编号
 === 章标标题
 本模板内置 2 套章标题显示风格，包含 hang（默认）与 display 两种风格，区别在于章标题单行显示（hang）
@@ -277,6 +277,7 @@
 待更新
 
 = 字体选项
+字体选项独立成章的原因是，我们希望本模板的用户关心模板使用的字体，知晓自己使用的字体以及遇到字体相关的问题能更加便捷地找到答案。
 
 先在终端 / 命令行输入 ```bash typst fonts``` 查看当前可用的字体，以在文档开头加入 `font` 参数修改字体设置以及使用的字体：
 
@@ -296,7 +297,28 @@
 )
 ```
 
-
+== 数学字体选项
+== 使用 newtx 系列字体
+=== 连字符
+=== 宏包冲突
+== 中文字体选项
+提供中文字体选项 `chinesefont`，可选项有
++ ctexfont：默认选项，使用 ctex 宏包根据系统自行选择字体，可能存在字体缺失的问题，更多内容参考
+ctex 宏包官方文档1。
++ founder：方正字体选项（需要安装方正字体），后台调用 ctex 宏包并且使用 fontset=none 选项，然后设
+置字体为方正四款免费字体，方正字体下载注意事项见后文，用户只需要安装方正字体即可使用该选项。
++ nofont：后台会调用 ctex 宏包并且使用 fontset=none 选项，不设定中文字体，用户可以自行设置中文字体，具体见后文。
+//TODO 字体设置待更新
+=== 方正字体选项
+typst会默认调用系统已有的字体，部分系统字体缺失严重，因此，用户希望能够使用其它字体，
+我们推荐使用方正字体。方正的方正书宋、方正黑体、方正楷体、方正仿宋四款字体均可免费试用，且可用于商
+业用途。用户可以自行从方正字体官网下载此四款字体，在下载的时候请务必注意选择 GBK 字符集，也可以使
+用 LATEX 工作室提供的方正字体，提取码为：njy9 进行安装。安装时，Win 10 用户请右键选择为全部用户安装，
+否则会找不到字体。
+=== 其他中文字体
+如果你想完全自定义字体2，你可以选择 `chinesefont=nofont`，然后在导言区设置
+```typ
+```
 
 
 
@@ -331,7 +353,9 @@
 在此放置脚注` #pin("r1")` #pin("r1") 可以画框。  #pin("r2") ` #pin("r1")`在此放置第二个脚注\ 然后在之后写`#pinit-rect("r1","r2")` 即可
 #pinit-rect("r1", "r2")
 
-
+= ElegantTypstBook 写作示例
+= 常见问题集
+= 版本更新历史
 
 
 

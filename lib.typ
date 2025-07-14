@@ -19,7 +19,7 @@
 // #import cosmos.clouds: *
 
 #let md = cmarker-render.with(math: mitex)
-
+//字体字典
 #let default-font = (
   main: "IBM Plex Serif",
   mono: "IBM Plex Mono",
@@ -27,6 +27,53 @@
   emph-cjk: "KaiTi",
   math: "New Computer Modern Math",
   math-cjk: "Noto Serif SC",
+)
+
+// ElegantBook 风格字体配置（基于 LaTeX ElegantBook 的真实字体设置）
+#let elegantbook-font = (
+  main: ("Times New Roman", "SimSun"), // 英文主字体：Times New Roman + 中文宋体
+  sans: ("Arial", "SimHei"), // 无衬线字体：Arial + 中文黑体
+  mono: ("Courier New", "SimSun"), // 等宽字体：Courier New + 中文宋体
+  cjk: "SimSun", // 中文正文：宋体
+  cjk-sans: "SimHei", // 中文粗体/标题：黑体
+  cjk-title: "SimHei", // 中文一级标题专用：黑体
+  emph-cjk: "KaiTi", // 中文斜体：楷体
+  math: ("New Computer Modern Math", "Cambria Math", "Times New Roman"), // 数学字体
+  math-cjk: "SimSun", // 数学中文字体：宋体
+)
+
+// 字体风格字典
+#let font-styles = (
+  ori: default-font,
+  elegantbook: elegantbook-font,
+)
+//颜色字典
+#let palettes = (
+  green: (
+    structure: rgb(0, 120, 2),
+    main: rgb(0, 120, 2),
+    second: rgb(230, 90, 7),
+    third: rgb(0, 160, 152),
+  ),
+  cyan: (
+    structure: rgb(31, 186, 190),
+    main: rgb(59, 180, 5),
+    second: rgb(175, 153, 8),
+    third: rgb(244, 105, 102),
+  ),
+  blue: (
+    structure: rgb(60, 113, 183),
+    main: rgb(0, 166, 82),
+    second: rgb(255, 134, 24),
+    third: rgb(0, 174, 247),
+  ),
+  gray: (
+    structure: rgb(150, 150, 150),
+    main: rgb(150, 150, 150),
+    second: rgb(150, 150, 150),
+    third: rgb(150, 150, 150),
+  ),
+  black: (structure: rgb(0, 0, 0), main: rgb(0, 0, 0), second: rgb(0, 0, 0), third: rgb(0, 0, 0)),
 )
 
 
@@ -50,11 +97,27 @@
 #let argmin = math.op("argmin", limits: true)
 
 
+/// 序章函数，用于创建不编号的序章
+/// - `title` (string): 序章标题
+/// - `body` (content): 序章内容
+/// -> content
+#let preface(title, body) = {
+  // 创建序章标记，用于页眉识别
+  [#metadata((type: "preface", title: title)) <preface-marker>]
+
+  // 添加到目录中（创建一个不编号的一级标题）
+  [#heading(level: 1, numbering: none, outlined: true, title)]
+
+  // 渲染序章内容
+  body
+}
+
+
 /// 模板的核心类，规范了文档的格式。
-/// - `media` (string): 输出介质，可选 `"screen"` 或 `"print"`，决定排版用纸尺寸与配色方案。默认 `"print"`。
+/// - `device` (string): 输出介质，可选 `"pad"` 或 `"normal"`，决定排版用纸尺寸与配色方案。默认 `"normal"`。
 /// - `theme` (string): 主题色调，可选 `"light"` 或 `"dark"`。影响整体背景与文字基色。默认 `"light"`。
-/// - `size` (length): 正文字号。可写 `pt` / `mm` / `em` 等单位。默认 `11pt`。
-/// - `screen-size` (length): 针对投屏/网页阅读的字号；未显式设置时沿用 `size`。默认 `11pt`。
+/// - `size` (length): 正文字号。可写 `pt` / `mm` / `em` 等单位。默认 `10pt`。
+/// - `pad-size` (length): 针对投屏/网页阅读的字号；未显式设置时沿用 `size`。默认 `10pt`。
 /// - `title` (string | none): 文档主标题，用于封面、页眉与 PDF 元数据。默认 `none`。
 /// - `short-title` (string | none): 短标题，出现在页眉与目录；缺省时回退到 `title`。默认 `none`。
 /// - `description` (string | none): 摘要/副标题，可填入一句话简介。默认 `none`。
@@ -64,9 +127,10 @@
 /// - `date` (datetime | none): 创建日期，典型写法 `datetime(year: 2025, month: 7, day: 14)`。默认 `none`。
 /// - `bibliography-file` (string | none): BibTeX/CSL JSON 路径；为空则禁用引用与参考文献。默认 `none`。
 /// - `bibstyle` (string): 引用与文献样式 ID，例如 `"gb-7714-2015-numeric"`, `"apa"`。默认 `"gb-7714-2015-numeric"`。
-/// - `paper-size` (string): 纸张尺寸，仅 `media: "print"` 时生效，如 `"a4"`、`"letter"`。默认 `"a4"`。
-/// - ` color` (color): 主题强调色 (HEX/CSS 名/色关键字)。用于一级标题、表格线与 `strong` 高亮。默认 `"#000000"`。
-/// - `font` (object): 字体族配置。可指定 `main`、`mono`、`cjk`、`math`、`math-cjk` 等子字段；缺省为 `default-font`。
+/// - `paper-size` (string): 纸张尺寸，仅 `device: "normal"` 时生效，如 `"a4"`、`"letter"`。默认 `"a4"`。
+/// - `color` (color): 主题强调色 (HEX/CSS 名/色关键字)。用于一级标题、表格线与 `strong` 高亮。默认 `"#000000"`。
+/// - `font-style` (string): 字体风格，可选 `"ori"` 或 `"elegantbook"`。`"ori"` 使用现代化字体，`"elegantbook"` 使用传统学术字体。默认 `"ori"`。
+/// - `font` (object): 字体族配置。可指定 `main`、`mono`、`cjk`、`math`、`math-cjk` 等子字段；缺省为选定风格的默认字体。
 /// - `lang` (string): 主要语言代码，影响分词、连字符、标点。默认 `"zh"`。
 /// - `region` (string): 地区代码，用于细化本地化规则。默认 `"cn"`。
 /// - `first-line-indent` (object): 段首缩进设置 `{amount, all}`；`all` 为 `true` 时连首段也缩进。默认 `{0pt, false}`。
@@ -78,10 +142,10 @@
 /// - body (content): 文档的内容。
 /// -> content
 #let elegant-typst-book(
-  media: "print",
+  device: "normal",
   theme: "light", //fix the bug
-  size: 11pt,
-  screen-size: 11pt,
+  size: 10pt,
+  pad-size: 10pt,
   title: none,
   short-title: none,
   description: none,
@@ -92,8 +156,9 @@
   bibliography-file: none,
   bibstyle: "gb-7714-2015-numeric",
   paper-size: "a4",
-   color: "#000000",
-  font: default-font,
+  color: "#000000",
+  font-style: "ori",
+  font: (:),
   lang: "zh",
   region: "cn",
   first-line-indent: (amount: 0pt, all: false),
@@ -128,31 +193,67 @@
   )
   // show: zebraw.with(..zebraw-themes.zebra-reverse)
   // show: zebraw.with(..zebraw-themes.zebra)
-  let  rgbcolor = rgb(color)
 
-  assert(media == "screen" or media == "print", message: "media must be 'screen' or 'print'")
+
+  assert(device == "pad" or device == "normal", message: "device must be 'pad' or 'normal'")
   assert(theme == "light" or theme == "dark", message: "theme must be 'light' or 'dark'")
-  let page-margin = if media == "screen" { (x: 35pt, y: 35pt) } else { auto }
-  let text-size = if media == "screen" { screen-size } else { size }
+  let page-margin = if device == "pad" { (x: 35pt, y: 35pt) } else { auto }
+  let text-size = if device == "pad" { pad-size } else { size }
   let bg-color = if theme == "dark" { rgb("#1f1f1f") } else { rgb("#ffffff") }
   let text-color = if theme == "dark" { rgb("#ffffff") } else { rgb("#000000") }
   let raw-color = if theme == "dark" { rgb("#27292c") } else { rgb("#f0f0f0") }
-  let font = default-font + font
+  // 根据字体风格选择基础字体配置
+  let base-font = if font-style == "elegantbook" {
+    elegantbook-font
+  } else {
+    default-font
+  }
+
+  // 合并用户自定义字体设置
+  let font = base-font + font
+
+  // 主题颜色配置
+
+  // 把 color 解析成真正的 Color（处理 "red" 这类关键字）
+  let resolved = if type(color) == str and color.starts-with("#") {
+    rgb(color) // 解析颜色字符串为 Color 类型
+  } else if type(color) == str and color in palettes {
+    // 如果 color 是调色板名，resolved 不需要
+    none
+  } else { color }
+
+  //  若字符串同时是主题名 → 整套调色板；否则四槽同 resolved
+  let palette = if type(color) == str and color in palettes {
+    palettes.at(color) // 使用 .at 方法进行动态字段访问
+  } else {
+    (structure: resolved, main: resolved, second: resolved, third: resolved)
+  }
+
+  //  四个真正的 Color 变量
+  let structure_color = palette.structure
+  let main_color = palette.main
+  let second_color = palette.second
+  let third_color = palette.third
 
 
   /// 设置字体。
   set text(
-    font: ((name: font.main, covers: "latin-in-cjk"), font.cjk),
+    font: font.main,
     size: text-size,
     fill: text-color,
     lang: lang,
     region: region,
+    weight: if font-style == "elegantbook" { "medium" } else { "regular" }, // 增加字体粗细
   )
-  // 设置中文粗体
-  show strong: set text(fill:  rgbcolor, font: ((name: font.main, covers: "latin-in-cjk"), font.cjk))
+  // 设置中文粗体，ElegantBook 风格下使用黑体
+  show strong: set text(
+    fill: structure_color,
+    font: if font-style == "elegantbook" { font.cjk-sans } else { font.main },
+    weight: "bold",
+  )
 
-  show emph: text.with(font: ((name: font.main, covers: "latin-in-cjk"), font.emph-cjk))
-  show raw: set text(font: ((name: font.mono, covers: "latin-in-cjk"), font.cjk))
+  show emph: text.with(font: font.emph-cjk)
+  show raw: set text(font: font.mono)
   // 数学公式的字体
   show math.equation: it => {
     set text(font: font.math)
@@ -160,11 +261,11 @@
   }
   // 数学公式中引入的中文字的字体
   show math.text: set text(
-    font: ((name: font.main, covers: "latin-in-cjk"), font.cjk),
+    font: font.cjk,
     // size: 1em,
   )
   // 文本高亮
-  set highlight(fill:  rgbcolor.lighten(50%))
+  set highlight(fill: structure_color.lighten(50%))
 
   /// 设置段落样式。
   set par(justify: true, first-line-indent: if first-line-indent == auto {
@@ -175,15 +276,60 @@
   // 计数器
   let chaptercounter = counter("chapter")
   /// 设置标题样式。
+  // show heading: it => {
+  //   // show h.where(amount: 0.3em): none
+  //   it
+  //   // if it.level == 1 and it.numbering != none {
+  //   //   chaptercounter.step()
+  //   //   counter(math.equation).update(0)
+  //   // }
+  // }
   show heading: it => {
-    show h.where(amount: 0.3em): none
+    // show h.where(amount: 0.3em): none
+    set text(fill: structure_color) if it.level != 1
     it
-    if it.level == 1 and it.numbering != none {
-      chaptercounter.step()
-      counter(math.equation).update(0)
-    }
   }
   show heading: set block(spacing: 1.2em)
+
+  // 调整二级标题字号为LaTeX \Large (14pt)
+  // show heading.where(level: 2): it => text(size: 1.4em, it) // 原em单位
+  // show heading.where(level: 2): it => text(size: 14pt, it)  // 原设置（接近但不完全匹配）
+  show heading.where(level: 2): it => text(size: 14.4pt, it)  // 精确匹配LaTeX \Large (14.4pt for 10pt base)
+  
+  // 调整三级标题字号为LaTeX \large (12pt)
+  // show heading.where(level: 3): it => text(size: 1.2em, it) // 原em单位
+  // show heading.where(level: 3): it => text(size: 12pt, it)  // 原设置（基础10pt下的\large）
+  show heading.where(level: 3): it => text(size: 12pt, it)  // 精确匹配LaTeX \large (12pt for 10pt base)
+
+
+  // 配置一级标题 - 简化实现确保黑体加粗
+  show heading.where(level: 1): it => {
+    let has-prev = query(heading.where(level: 1).before(here())).len() > 0;
+    
+    // 直接定义标题样式，确保黑体加粗
+    let chap = block(width: 100%)[
+      #v(+20pt)
+      #set align(center)
+      #text(
+        fill: structure_color,
+        font: ("SimHei", "Microsoft YaHei", "Heiti SC", "WenQuanYi Micro Hei"),  // 多系统兼容黑体
+        weight: "bold",
+        // size: 1.5em,  // 原尺寸（约15pt）
+        // size: 1.7em  // 调整为与LaTeX \LARGE一致（约17pt）
+        // size: 17pt  // 原设置（接近但不完全匹配）
+        size: 17.28pt  // 精确匹配LaTeX \LARGE (17.28pt for 10pt base)
+      )[#it]
+      #v(+20pt)
+    ]
+    
+    if has-prev {
+      pagebreak()
+      chap
+    } else {
+      chap
+    }
+  }
+
 
   /// 设置代码块样式。
   show raw.where(block: false): body => box(
@@ -239,7 +385,11 @@
 
 
   /// 设置 figure 样式。
+  // 原始代码：show figure.where(kind: table): set figure.caption(position: top)
   show figure.where(kind: table): set figure.caption(position: top)
+  
+  // 全局设置所有标题字号为 9pt (与LaTeX \small一致)
+  show figure.caption: cap => text(size: 9pt, cap)
 
   /// 设置列表样式。
   set list(indent: 6pt)
@@ -267,7 +417,9 @@
 
   // 配置表格（不能用if{}，因使用if{}后作用域仅局限在块里，无法影响body）
   set table(
-    fill: (_, row) => if row == 0 {  rgbcolor.lighten(60%) } else {  rgbcolor.lighten(80%) },
+    fill: (_, row) => if row == 0 { structure_color.lighten(60%) } else {
+      structure_color.lighten(80%)
+    },
     stroke: 1pt + white,
   ) if theme == "light"
 
@@ -285,30 +437,41 @@
         return
       }
       // 获取正确的章节标题
-      let elems = query(heading.where(level: 1).after(here()))
-
       let chapter-title = ""
 
-      if (elems == () or elems.first().location().page() != here().page()) {
-        let elems = query(heading.where(level: 1).before(here()))
-        if (elems != ()) { chapter-title = elems.last().body }
+      // 首先检查当前页面是否有序章标记
+      let preface-elems = query(<preface-marker>).filter(it => it.location().page() == here().page())
+
+      if preface-elems.len() > 0 {
+        // 当前页面有序章，使用序章标题
+        chapter-title = preface-elems.first().value.title
       } else {
-        chapter-title = elems.first().body
+        // 没有序章，使用正常的章节标题逻辑
+        let elems = query(heading.where(level: 1).after(here()))
+
+        if (elems == () or elems.first().location().page() != here().page()) {
+          let elems = query(heading.where(level: 1).before(here()))
+          if (elems != ()) { chapter-title = elems.last().body }
+        } else {
+          chapter-title = elems.first().body
+        }
       }
       // 修改页眉为 章节标题  short-title  semester
       // 其中章节标题和 semester奇偶轮换，若无短标题(short-title)，就使用标题(title)
       let head-title = text()[
+
         #if short-title != none {
           short-title
         } else {
           title
         }
       ]
+      set text(fill: structure_color)
       let (lefthead, midhead, righthead) = if calc.even(here().page()) == true {
         (chapter-title, head-title, semester)
       } else { (semester, head-title, chapter-title) }
 
-      set text(0.9em)
+      set text(9pt)  // 与LaTeX \footnotesize一致 (9pt)
       stack(
         spacing: 0.2em,
         grid(
@@ -317,9 +480,9 @@
           align(left, lefthead), align(center, midhead), align(right, righthead),
         ),
         v(0.3em),
-        line(length: 100%, stroke: 1pt + text-color),
+        // line(length: 100%, stroke: 1pt + text-color),
         v(.15em),
-        line(length: 100%, stroke: .5pt + text-color),
+        line(length: 100%, stroke: .5pt + structure_color),
       )
 
       // reset footnote counter
@@ -420,10 +583,12 @@
       #align(center + top)[
         #if date != none {
           text(size: 12pt, "最初写作于：")
-          text(size: 12pt, fill:  rgbcolor, weight: "semibold", date.display("[year]年[month]月[day]日"))
+          text(size: 12pt, fill: structure_color, weight: "semibold", date.display("[year]年[month]月[day]日"))
           parbreak()
           text(size: 12pt, "最后更新于：")
-          text(size: 12pt, fill:  rgbcolor, weight: "semibold", datetime.today().display("[year]年[month]月[day]日"))
+          text(size: 12pt, fill: structure_color, weight: "semibold", datetime
+            .today()
+            .display("[year]年[month]月[day]日"))
         } else {
           (
             text(size: 11pt)[最后更新于：#h(5pt)]
@@ -479,5 +644,3 @@
     bibliography(bibliography-file, title: "参考文献", style: bibstyle) // apply bibstyle here.
   }
 }
-
-
