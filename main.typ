@@ -3,18 +3,19 @@
 #set heading(numbering: numbly("{1:第一章 }", default: "1.1  "))
 
 #show: elegant-typst-book.with(
+  device: "normal", // 输出介质："normal"（印刷）或 "pad"（屏幕阅读），决定用纸尺寸与边距
   title: [ElegantTypstBook\ 优美的Typst书籍模板],
-  short-title: [ElegantTypstBook],
-  // 笔记描述（选填）
+  short-title: [ElegantTypstBook], // 页眉/目录显示的短标题
+  // 文档副标题（选填，显示在封面主标题下方）
   description: [
     文档描述示例\ 逸一时误一世，忆久忆久罢已龄
   ],
-  // 笔记创建日期（选填）
+  // 创建日期（选填，支持自动更新）
   date: datetime(year: 2025, month: 6, day: 24),
   authors: (
     (
       name: "作者一",
-      //github: "https://github.com/a-kkiri",
+      github: "https://github.com/a-kkiri",
       //homepage: "https://github.com/a-kkiri",
       affiliations: "1,2",
     ),
@@ -26,79 +27,47 @@
     ),
   ),
 
-  // 所属组织列表，每一项包括一个 id 和 name。这些将显示在作者下方。
+  // 机构对照表（id需与authors中的affiliations对应）
   affiliations: (
     (id: "1", name: "114 University"),
     (id: "2", name: "514 Inc."),
-    (id: "1", name: "1919 University"),
-    (id: "2", name: "810 Inc."),
+    (id: "3", name: "1919 University"),
+    (id: "4", name: "810 Inc."),
   ),
-  // 学期
-  semester: "2025 春",
-  // 参考书目文件路径及引用样式
+  semester: "2025 春", // 学期（用于页眉显示）
+  // 参考文献配置（需提前准备.bib文件）
   bibliography-file: "refs.bib",
-  bibstyle: "gb-7714-2015-numeric",
-  // 是否生成标题和目录
-  maketitle: true,
-  makeoutline: true,
-  outline-depth: 4,
-  // 主题色 可选green cyan blue gray black
+  bibstyle: "gb-7714-2015-numeric", // 国标GB/T 7714-2015 numeric格式
+  // 封面与目录生成控制
+  maketitle: true, // 自动生成封面页
+  makeoutline: true, // 自动生成目录
+  outline-depth: 4, // 目录层级（1-4级标题）
+  // 主题色："green"/"cyan"/"blue"/"gray"/"black"
   color: "blue",
-  // 字体风格设置 可选 "ori" 或 "elegantbook"
-  // "ori": 现代化字体（IBM Plex Serif + Noto Serif SC）
-  // "elegantbook": 传统学术字体（TeX Gyre Termes + SimSun，兼容 LaTeX ElegantBook）
-  // font-style: "elegantbook",
-  // 封面背景图片（选填图片路径或 none）
-  // cover-image: "./figures/cover-image.png",
-  // 正文背景颜色（选填 HEX 颜色或 none）
+  // 字体方案："ori"（现代）/"ctex"（兼容）/"founder"（方正）
+  font-style: "founder",
+  // 封面背景图（暂未配置）
+  // cover-image: none,
+  // 正文背景色（建议仅light主题使用，如 "#FAF9DE"）
   // background-color: "#FAF9DE",
-  first-line-indent: auto,
-  // theme: "dark", //此处有bug
-  // media: "screen",
+  first-line-indent: auto, // 自动段首缩进（2字符，首段缩进）
+  theme: "dark", // 深色模式
 )
 
-// // 强制一级标题使用黑体加粗（最终解决方案）
-// #show heading.where(level: 1): it => {
-//   text(
-//     font: "SimHei",
-//     weight: "bold",
-//     size: 1.5em,
-//     // fill: rgb(0, 120, 2)
-//   )[#it.body]  // 仅应用于标题文本内容，解决样式覆盖问题
-// }
-
-
-// // —— 正文：宋体 ——
-//   #set text(lang: "zh", font: "SimSun", size: 11pt)
-
-
 #preface("序章")[
-  这是一个序章示例，用于测试序章功能。
+  本模板采用`#preface()`函数实现序章功能，具有以下特性：
+  - 不影响后续章节编号（第一章仍从"第一章"开始）
+  - 支持页眉标题自动识别（通过元数据`<preface-marker>`）
+  - 与正文保持一致排版样式（17.28pt黑体标题，10pt正文字号）
 
-  序章通常用于引言、背景介绍或者概述整本书的内容。它不会影响后续章节的编号，第一章仍然会显示为"第一章"。
+  == 模板版本说明
+  当前版本：v1.0.0（基于Typst 0.11.0开发）
+  核心依赖宏包版本：
+  - `@preview/cetz:0.4.0`（绘图引擎）
+  - `@preview/theorion:0.3.3`（定理环境）
+  - `@preview/tablem:0.2.0`（三线表功能）
 
-  这个序章的标题会在页眉中正确显示，并且具有与正常章节相同的视觉样式。
-
-  == 字体风格测试
-
-  当前使用的是 `elegantbook` 字体风格，具有以下特性：
-  - `英文字体`：TeX Gyre Termes（类似 Times New Roman）
-  - `中文字体`：宋体（SimSun）系列
-  - `一级标题`：使用粗体显示
-  - `数学字体`：TeX Gyre Termes Math
-
-  这些设置与 LaTeX ElegantBook 模板保持一致，提供传统学术文档的外观。
-
-  如需切换到现代字体风格，请将 `font-style` 设置为 `"ori"`。
-  // —— 第一段：黑体 (SimHei) ——
-#text(font: "SimHei", weight: "bold")[
-这是第一段文字，使用黑体 SimHei。
-]
-
-// —— 第二段：宋体 (SimSun) ——
-#text(font: "SimSun")[
-这是第二段文字，使用宋体 SimSun。
-]
+  完整序章内容已迁移至附录，可通过目录跳转查看。
 ]
 
 #include "content/charpter1.typ"

@@ -1,31 +1,24 @@
-#import "@preview/theorion:0.3.3": *
-#import cosmos.fancy: *
-
-// #import cosmos.rainbow: *
-// #import cosmos.clouds: *
-#show: show-theorion
-
-#set page(height: auto)
-#set heading(numbering: "1.1")
-#set text(lang: "en")
-= Test
-#definition[
-  define test
-]
-
-// ---------------- main_test.typ ----------------
+#import "@preview/numbly:0.1.0": numbly
 #import "lib_test.typ": elegant-typst-book
 
+#set heading(numbering: numbly("{1:第一章 }", default: "1.1  "))
+
 #show: elegant-typst-book.with(
-  title: [示例文档],
-  short-title: [示例],
-  maketitle: false,
+  font-style: "elegantbook"  // 移除size参数，匹配函数定义
 )
 
-= 第一章 黑体标题
+= 测试一级标题（应显示为黑体）
+这是正文内容（应显示为宋体）。通过完整迁移字体配置，此示例应复现完整版本的字体问题。
 
-这里是正文，应该呈现为 **宋体 SimSun**。
+== 二级标题示例（应显示为宋体加粗）
+*粗体文本*（应显示为黑体）和_斜体文本_（应显示为楷体）的样式测试。
 
-== 1.1 二级标题（仍用宋体粗体）
+// 代码块字体测试
+```rust
+fn main() {
+    println!("代码块应使用Courier New字体");
+}
+```
 
-更多正文……
+// 数学公式测试
+$E = m \cdot c^2$（公式中的中文应显示为宋体）

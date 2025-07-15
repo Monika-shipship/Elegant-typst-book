@@ -7,14 +7,29 @@
 GitHub 地址：#link("https://github.com/Monika-shipship/Elegant-typst-book")
 == 快速开始
 
-要开始使用此模板，你需要
+要开始使用此模板，你需要：
 
+=== 字体安装要求
+根据选择的`font-style`参数，需安装对应字体包：(在我们的#link("https://github.com/Monika-shipship/Elegant-typst-book")[Github仓库]内也存有必要的字体)
 
-+ 安装必须的字体包，包括：
-  - #link("https://github.com/IBM/plex")[*IBM Plex Sans, Mono*]
-  - #link("https://github.com/notofonts/noto-cjk")[*Noto Serif CJK SC*]
+#three-line-table[
+| 字体方案 | 必需字体 | 下载链接 | 适用场景 |
+|----------|----------|----------|----------|
+| *ori*（现代字体） | IBM Plex Serif/Sans/Mono | #link("https://github.com/IBM/plex")[GitHub官方仓库] | 学术论文/现代风格书籍 |
+|  | Noto Serif CJK SC | #link("https://github.com/notofonts/noto-cjk")[Google Noto CJK] | 多语言支持 |
+| *ctex*（兼容LaTeX） | Times New Roman | 系统内置（Windows） | 传统学术排版 |
+|  | 宋体/黑体/楷体 | 系统内置（Windows） | 符合GB/T 7714规范 |
+| *founder*（方正字体） | 方正书宋简体 | #link("http://www.foundertype.com")[方正字体官网] | 中文排版优化 |
+|  | 方正黑体简体 | #link("http://www.foundertype.com")[方正字体官网] | 标题与强调文本 |
+]
 
-+ 导入模板，并在文档开头设置参数，包括标题、作者、课程或主题、学期、时间；
+*安装说明*：
+1. 下载字体文件（建议选择OTF格式）
+2. Windows用户：右键"为所有用户安装"
+3. 验证安装：终端执行 `typst fonts | grep "字体名称"`
+
+=== 模板初始化
++ 导入模板并配置核心参数：
   ```typ
   #import "lib.typ": *
 

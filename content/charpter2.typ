@@ -5,7 +5,14 @@
 
 == 参数总览
 
-- `media` (string): 输出介质，可选 `"pad"` 或 `"normal"`，决定排版用纸尺寸与配色方案。默认 `"normal"`。
+- `device` (string): 输出介质，可选 `"pad"`（屏幕阅读）或 `"normal"`（印刷出版）。`pad`模式自动优化边距为16mm并增大字号至12pt，`normal`模式使用标准排版参数。默认 `"normal"`。
+- `theme` (string): 主题色调，可选 `"light"` 或 `"dark"`。`light`模式使用白色背景黑色文字，`dark`模式使用深色背景浅色文字（实验性功能）。默认 `"light"`。
+- `size` (length): 正文字号，支持`pt`/`mm`/`em`单位。`normal`模式默认 `10pt`，`pad`模式默认 `12pt`。
+- `font-style` (string): 字体方案三选一：
+  + `"ori"`：现代字体（IBM Plex Serif + Noto Serif SC）
+  + `"ctex"`：CTEX兼容字体（Times New Roman + 宋体）
+  + `"founder"`：方正字体（书宋/黑体/楷体/仿宋）
+- `color` (string): 主题强调色，可选 `"green"`/`"cyan"`/`"blue"`/`"gray"`/`"black"`。影响一级标题、表格线和`strong`文本颜色。默认 `"blue"`。
 - `theme` (string): 主题色调，可选 `"light"` 或 `"dark"`。影响整体背景与文字基色。默认 `"light"`。
 - `size` (length): 正文字号。可写 `pt` / `mm` / `em` 等单位。默认 `11pt`。
 - `pad-size` (length): 针对投屏/网页阅读的字号；未显式设置时沿用 `size`。默认 `11pt`。
@@ -31,11 +38,52 @@
 - `background-color` (color | none): 正文背景色，建议仅在 `theme: "light"` 下使用。默认 `none`。
 - `body` (content): 文档的内容。
 == 设备选项
-如果在 iPad 上看无需切边，放大你可以使用下面的选项将版面设置为 `pad`模式： \
-`media` (string): 输出介质，可选 `"pad"` 或 `"normal"`，决定排版用纸尺寸与配色方案。默认 `"normal"`。
+模板通过`device`参数优化不同阅读场景的排版效果：
+
+- *屏幕阅读（pad模式）*：`device: "pad"`
+  - 自动调整边距为16mm（适合平板/电子书）
+  - 字号默认增大至12pt（可通过`pad-size`参数自定义）
+  - 优化行间距与对比度，减轻长时间阅读疲劳
+
+- *印刷出版（normal模式）*：`device: "normal"`（默认）
+  - 使用标准印刷边距（A4纸张约25mm）
+  - 字号默认10pt（通过`size`参数调整）
+  - 采用紧凑排版，节省纸张空间
+
+配置示例：
+```typ
+#show: elegant-typst-book.with(
+  device: "pad",       // 启用屏幕阅读优化
+  pad-size: 14pt,      // 自定义屏幕阅读字号
+  // ...其他参数
+)
+```
 == 颜色主题
-你可以配置 `color` 为颜色主题，可选参数有 `orange` `blue` `olive` `red` `eastern` `yellow` `navy`
-此颜色用于一级标题、表格线与 `strong` 高亮//TODO 颜色主题表格更新
+模板通过`color`参数控制整体色调风格，可选预设主题色如下：
+
+#three-line-table[
+| 主题色参数 | RGB值 | 应用场景 |
+|------------|-------|----------|
+| `green` | rgb(0, 120, 2) | 学术论文/教材 |
+| `cyan` | rgb(31, 186, 190) | 演示文稿/幻灯片 |
+| `blue`（默认） | rgb(60, 113, 183) | 正式报告/书籍 |
+| `gray` | rgb(150, 150, 150) | 草稿/内部文档 |
+| `black` | rgb(0, 0, 0) | 印刷出版物 |
+]
+
+主题色将影响以下元素：
+- 一级标题文字颜色
+- 三线表表头与线条颜色
+- `strong`强调文本颜色
+- 定理环境边框颜色
+
+配置示例：
+```typ
+#show: elegant-typst-book.with(
+  color: "green",  // 使用绿色主题
+  // ...其他参数
+)
+```
 == 封面
 // === 封面个性化
 // === 封面图
@@ -44,22 +92,46 @@
 封面内容暂不更新
 == 编号
 === 章标标题
-本模板内置 2 套章标题显示风格，包含 hang（默认）与 display 两种风格，区别在于章标题单行显示（hang）
-与双行显示（display），本说明使用了 hang。调用方式为
-```typ
-```
-在章标题内，章节编号默认是以数字显示，也即第 1 章，第 2 章等等，如果想要把数字改为中文，可以使用
-```typ
-```
-可以使用 `numbly` 包设置标题编号样式：
+本模板内置 2 套章标题显示风格，通过`heading`设置控制：
 
++ 标题样式选择
+  - *hang 风格*（默认）：章标题单行显示
+    ```typ
+    #show heading.where(level: 1): it => {
+      set text(size: 17.28pt, weight: "bold")
+      block(align: left)[#it.numbering #it.body]
+    }
+    ```
+
+  - *display 风格*：章编号与标题分行显示
+    ```typ
+    #show heading.where(level: 1): it => {
+      set text(size: 17.28pt, weight: "bold")
+      stack(
+        align: center,
+        text(size: 2em)[#it.numbering],
+        it.body
+      )
+    }
+    ```
+
++ 编号格式自定义
+使用`numbly`包设置标题编号样式：
 ```typ
-#set heading(numbering: numbly("{1:一}、", default: "1.1  "))
+// 中文数字编号（一、二、三...）
+#set heading(numbering: numbly("{1:第{Chinese}章 }", "{2:第{Chinese}节 }"))
+
+// 罗马数字编号（I、II、III...）
+#set heading(numbering: numbly("{1:I. }", "{2:I.{i} }"))
+
+// 混合编号（第1章、1.1节）
+#set heading(numbering: numbly("{1:第{arabic}章 }", "{2:{arabic}.{arabic} }"))
 ```
 
-参数中，`{*:1}` 的 `*` 代表标题的级别，`1` 代表标题的格式。`{1:一}、` 代表一级标题的格式为 `一、`，并且设置了默认格式 `1.1  `。
-
-*注意*，本模板默认去除了标题 numbering 后的空格，所以在设置标题编号时请注意空格的使用。如 `"1.1  "` 的末尾有两个空格，这样在标题编号后会有两个空格。
+*注意*：编号格式字符串中：
+- `{1:}` 表示一级标题格式，`{2:}` 表示二级标题格式
+- `{Chinese}` 生成中文数字，`{arabic}` 生成阿拉伯数字，`{roman}` 生成罗马数字
+- 编号后需添加空格分隔，如 `"第{arabic}章 "`（末尾有空格）
 === 数学公式编号
 
 为每个行间公式设置了公式编号，样式为 (a.b) ，其中a为章节号，b为该章公式序号
@@ -207,7 +279,7 @@
 
 `````typ
 #md(````markdown
-  支持 **加粗**、*斜体*、~~删除线~~、[链接](https://typst.com)、LaTeX 数学公式 $\max_{x \in X} f(x)$ 等 Markdown 语法。
+  支持 *加粗*、*斜体*、~~删除线~~、[链接](https://typst.com)、LaTeX 数学公式 $\max_{x \in X} f(x)$ 等 Markdown 语法。
 ````)
 `````
 
@@ -215,7 +287,7 @@
   width: 100%,
   md(
     ````markdown
-      支持 **加粗**、*斜体*、~~删除线~~、[链接](https://typst.com)、LaTeX 数学公式 $\max_{x \in X} f(x)$ 等 Markdown 语法。
+      支持 *加粗*、*斜体*、~~删除线~~、[链接](https://typst.com)、LaTeX 数学公式 $\max_{x \in X} f(x)$ 等 Markdown 语法。
     ````,
   ),
 )
@@ -328,42 +400,29 @@ typst会默认调用系统已有的字体，部分系统字体缺失严重，因
 
 
 == `pinit` 脚注包使用方法
-=== 强调
-在此放置脚注` #pin("h1")` #pin("h1")，可以强调此内容。#pin("h2") ` #pin("h2")`在此放置第二个脚注，然后在之后写`#pinit-highlight("h1","h2")` 即可
-#pinit-highlight("h1", "h2")
+此宏包似乎有导致`Typst` 预览器部分崩溃的bug，暂时不推荐使用（在此处的源代码的注释里展示了部分内容）
+// === 强调
+// 在此放置脚注` #pin("h1")` #pin("h1")，可以强调此内容。#pin("h2") ` #pin("h2")`在此放置第二个脚注，然后在之后写`#pinit-highlight("h1","h2")` 即可
+// #pinit-highlight("h1", "h2")
 
+// === 画线
+// 在此放置脚注` #pin("l1")` #pin("l1") ，可以画线。 \ #pin("l2") ` #pin("l1")`在此放置第二个脚注
+// 然后在之后写\
+// `#pinit-line(stroke: 2pt + red, start-dy: -0.25em, end-dy: -0.25em, "l1", "l2")` 即可
+// #pinit-line(stroke: 2pt + red, start-dy: -0.25em, end-dy: -0.25em, "l1", "l2")
 
+// === 脚注
+// 这是一个问题？#pin("que")这是答案#pin("ans")，使用`#pinit-point-to()[]`和`#pinit-point-from()[]`即可
+// #pinit-point-to("que", fill: red, redbold[问题])
 
-
-=== 画线
-在此放置脚注` #pin("l1")` #pin("l1") ，可以画线。 \ #pin("l2") ` #pin("l1")`在此放置第二个脚注
-然后在之后写\
-`#pinit-line(stroke: 2pt + red, start-dy: -0.25em, end-dy: -0.25em, "l1", "l2")` 即可
-#pinit-line(stroke: 2pt + red, start-dy: -0.25em, end-dy: -0.25em, "l1", "l2")
-
-=== 脚注
-这是一个问题？#pin("que")这是答案#pin("ans")，使用`#pinit-point-to()[]`和`#pinit-point-from()[]`即可
-#pinit-point-to("que", fill: red, redbold[问题])
-
-#pinit-point-from("ans", body-dx: +10pt)[
-  答案
-]
-#linebreak()
-=== 框
-在此放置脚注` #pin("r1")` #pin("r1") 可以画框。  #pin("r2") ` #pin("r1")`在此放置第二个脚注\ 然后在之后写`#pinit-rect("r1","r2")` 即可
-#pinit-rect("r1", "r2")
+// #pinit-point-from("ans", body-dx: +10pt)[
+//   答案
+// ]
+// #linebreak()
+// === 框
+// 在此放置脚注` #pin("r1")` #pin("r1") 可以画框。  #pin("r2") ` #pin("r1")`在此放置第二个脚注\ 然后在之后写`#pinit-rect("r1","r2")` 即可
+// #pinit-rect("r1", "r2")
 
 = ElegantTypstBook 写作示例
 = 常见问题集
 = 版本更新历史
-
-
-
-
-
-
-
-
-
-
-
